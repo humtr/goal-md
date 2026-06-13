@@ -1,6 +1,6 @@
 ---
 name: goal-md
-description: Use when a project needs a GOAL.md-centered workflow: analyze the project, shape user intent into a durable living objective, keep an acceptance ledger, raise the goal threshold from current evidence, and prepare a resumable /goal entrypoint without storing reusable /goal prompts in GOAL.md.
+description: "Use when a project needs a GOAL.md-centered workflow: analyze the project, shape user intent into a durable living objective, keep an acceptance ledger, raise the goal threshold from current evidence, and prepare a resumable /goal entrypoint without storing reusable /goal prompts in GOAL.md."
 ---
 
 # Goal-md
