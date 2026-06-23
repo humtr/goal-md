@@ -20,6 +20,10 @@ Active seed repository. This repo is intentionally small and should stay focused
 
 There is no required build step yet. Add Markdown documents or examples directly to the repository.
 
+## Validation
+
+There is no automated validation yet. For now, keep Markdown files simple, readable on GitHub, and free of private credentials or personal secrets.
+
 ## Next steps
 
 1. Decide whether this repository is a document template library, a CLI/tooling project, or an archive candidate.
