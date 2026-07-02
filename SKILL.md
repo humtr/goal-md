@@ -21,6 +21,13 @@ a long-running goal ledger, keep the canonical goal outside that repository as
 case, treat the external goal file as canonical and keep only product-local
 material in the target repository.
 
+Human-friendly goal aliases are supported through `goals/index.json`. If the
+user writes `/goal codex`, `/goal resume codex`, `goal codex`, or otherwise
+provides a short goal name instead of a file path, resolve it with
+`scripts/resolve_goal.py <alias>` and then read the returned goal file as
+canonical. If the alias is unknown, list the available aliases from the index
+instead of asking the user to remember a path.
+
 ## Workflow
 
 1. Analyze the current project and identify the public surface, risks,

@@ -31,8 +31,24 @@ this repository instead:
 goals/<repo>-goal.md
 ```
 
-The first project using this pattern is `goals/codex-goal.md`, which tracks
+Register reusable goals in `goals/index.json` so agents can use short names
+instead of full paths. The first registered alias is `codex`, which tracks
 follow-up hardening for `humtr/codex` while keeping that repository product-only.
+
+Human-friendly forms supported by the skill:
+
+```text
+/goal codex
+/goal resume codex
+goal codex
+```
+
+Resolver utility:
+
+```bash
+python3 scripts/resolve_goal.py codex
+python3 scripts/resolve_goal.py codex --field resume-prompt
+```
 
 ## Validation
 
