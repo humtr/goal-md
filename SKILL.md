@@ -15,6 +15,12 @@ current project. Do not store a reusable `/goal` prompt inside `GOAL.md`.
 Treat `/goal` as an entrypoint derived from the current `GOAL.md` at resume or
 start time.
 
+When a target repository must remain product-only or otherwise should not carry
+a long-running goal ledger, keep the canonical goal outside that repository as
+`goals/<repo>-goal.md` in this repo or another explicit goal store. In that
+case, treat the external goal file as canonical and keep only product-local
+material in the target repository.
+
 ## Workflow
 
 1. Analyze the current project and identify the public surface, risks,

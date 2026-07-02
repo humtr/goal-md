@@ -1,7 +1,8 @@
 # GOAL.md Template
 
-This template is for a project-specific `GOAL.md`. It is the living objective
-and acceptance ledger for that project.
+This template is for a project-specific `GOAL.md`, or for an external
+`goals/<repo>-goal.md` when the target repository should not contain a goal
+ledger. It is the living objective and acceptance ledger for that project.
 
 ## Public Contract
 

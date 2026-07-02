@@ -14,11 +14,25 @@ Active seed repository. This repo is intentionally small and should stay focused
 
 - Draft simple goal documents in Markdown.
 - Keep examples small and easy to review.
+- Keep product repositories free of long-running goal ledgers when their scope
+  needs to stay product-only.
+- Store external project goals under `goals/<repo>-goal.md` when the goal is
+  useful but should not live in the target repository.
 - Avoid adding runtime dependencies until the repository has a concrete tool or workflow.
 
 ## Usage
 
 There is no required build step yet. Add Markdown documents or examples directly to the repository.
+
+For product repositories that should not contain goal ledgers, keep the goal in
+this repository instead:
+
+```text
+goals/<repo>-goal.md
+```
+
+The first project using this pattern is `goals/codex-goal.md`, which tracks
+follow-up hardening for `humtr/codex` while keeping that repository product-only.
 
 ## Validation
 
