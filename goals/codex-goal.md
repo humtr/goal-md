@@ -10,46 +10,51 @@ This goal intentionally lives outside `humtr/codex` as
 repo must not carry long-running goal ledgers, generic automation plans,
 handoff material, or operations framework documents.
 
-Target score improvements now use a stricter rule: remove at least 90% of
-each dimension's distance from 100. The previous draft used an 80% reduction
-threshold; this goal deliberately raises the bar.
+Target score improvements now use the strictest rule so far: remove at least
+95% of each dimension's distance from 100. The previous draft used a 90%
+reduction threshold; this goal deliberately raises the bar again.
 
-| Dimension | Current | Current Gap | 90% Gap Reduction Target | Reason |
+| Dimension | Current | Current Gap | 95% Gap Reduction Target | Reason |
 | --- | ---: | ---: | ---: | --- |
-| Goal record hygiene | 98 | 2 | 99.8+ | Externalize the goal ledger and keep codex product-only. |
-| Thin wrapper philosophy | 89 | 11 | 98.9+ | Leave shell as Termux glue, not policy or parsing logic. |
-| Refactor quality | 92 | 8 | 99.2+ | Prevent Python CLI monolith growth and tighten ownership. |
-| Product validation confidence | 96 | 4 | 99.6+ | Add mismatch, tuple, network-disabled, and doctor-field proof. |
-| Merge candidate maturity | 93 | 7 | 99.3+ | Remove non-product artifacts and leave a clean, reviewable stack. |
+| Goal record hygiene | 98 | 2 | 99.9+ | Externalize the goal ledger and keep codex product-only. |
+| Thin wrapper philosophy | 89 | 11 | 99.45+ | Leave shell as Termux glue, not policy or parsing logic. |
+| Refactor quality | 92 | 8 | 99.6+ | Prevent Python CLI monolith growth and tighten ownership. |
+| Product validation confidence | 96 | 4 | 99.8+ | Add mismatch, tuple, network-disabled, and doctor-field proof. |
+| Merge candidate maturity | 93 | 7 | 99.65+ | Remove non-product artifacts and leave a clean, reviewable stack. |
 
 The final state should feel like a completed product wrapper, not an
 automation experiment: small shell entrypoints, explicit contracts, Python
 decision modules, strong product-local tests, and no generic orchestration.
 
-The 90% target is intentionally hard. It means the branch should not merely be
-mergeable; it should be difficult to improve without changing product scope.
+The 95% target is intentionally hard. It means the branch should not merely be
+mergeable; it should be difficult to improve without changing product scope,
+and any remaining imperfection must be explicitly justified by Termux runtime
+constraints or reviewability.
 
 ## Current Evidence
 
 Baseline branch:
 
 - `refactor/python-boundary-expansion`
-- Latest pushed commit at 90% goal lift: `80f7d8c Externalize codex goal ledger`
-- Product code proof from the prior Python boundary goal:
-  - installed wrapper: `260702-11 (dbbabbd86348)`
-  - `tests/run-portable.sh`: pass
-  - `tests/run-termux.sh`: pass
-  - rebuild smoke: pass
-  - `tests/run-all.sh`: pass
-  - `canon-audit --strict`: pass, findings `[]`
-- Externalization proof after that product proof:
+- Latest pushed main commit at 95% goal lift: `80f7d8c Externalize codex goal ledger`
+- Main merge proof:
+  - `refactor/python-boundary-expansion` fast-forwarded into `main`
+  - `main` pushed to `origin/main` through `80f7d8c`
   - `GOAL.md` removed from `humtr/codex`
   - external goal stored in `humtr/goal-md`
-  - codex branch pushed through `80f7d8c`
+- Post-merge product proof on `main`:
+  - installed wrapper: `260702-12 (80f7d8ccab8e)`
+  - `bash -n` protected shell/scripts: pass
+  - `validate --root .`: pass
+  - `canon-audit --strict`: pass, findings `[]`
+  - `tests/run-portable.sh`: pass
+  - `tests/run-termux.sh`: pass
+  - cached rebuild smoke: pass
+  - `tests/run-all.sh`: pass
 
 The final product proof for this lifted goal must be rerun after the next
-refactor commits, because `80f7d8c` intentionally changed repository hygiene
-and wrapper version metadata after the previous installed-wrapper proof.
+hardening commits, because the 95% goal is a new quality threshold rather than
+the already-merged Python boundary expansion.
 
 Current measured structure:
 
@@ -152,8 +157,8 @@ Allowed by default:
 ## Execution Strategy
 
 This is a hardening goal, not a feature goal. Work in small local checkpoints,
-but evaluate progress against the 90% gap-reduction targets. Do not accept a
-change merely because tests pass; accept it only if it makes the wrapper
+but evaluate progress against the 95% gap-reduction targets. Do not accept a
+change merely because tests pass; accept it only if it materially makes the wrapper
 thinner, clearer, more product-local, or better proven.
 
 Recommended branch policy:
@@ -169,7 +174,7 @@ Scoring rule:
 
 - A phase is not complete because files changed.
 - A phase is complete when the acceptance checks prove the relevant score gap
-  was reduced.
+  was reduced to the 95% target or an explicit exception is justified.
 - If a metric target is unreachable without harming clarity, document the
   exception and compensate with stronger tests or audit coverage.
 
@@ -186,7 +191,7 @@ Acceptance:
 - `/data/data/com.termux/files/home/prj/goal-md/goals/codex-goal.md` exists.
 - `humtr/goal-md` records the external-goal convention.
 - The codex repo has no goal ledger or generic operations material.
-- Goal record hygiene score is at least 99.8.
+- Goal record hygiene score is at least 99.9.
 
 ### Phase 1: Product Purity Cleanup
 
@@ -205,19 +210,19 @@ Acceptance:
 
 Make the thin-wrapper philosophy measurable with stricter budgets.
 
-Target budgets for the 90% goal:
+Target budgets for the 95% goal:
 
-- `lib_lines` <= 85 unless loader clarity would suffer.
-- `install_runtime_lines` <= 450.
-- `domain_shell_lines` <= 1800.
-- `lib_shell_functions` <= 110.
-- `runtime_shell_lines` <= 575.
-- `state_shell_lines` <= 275.
-- `notify_shell_lines` <= 260.
-- `profile_shell_lines` <= 300.
-- `notify_shell_functions` <= 12.
-- `profile_shell_functions` <= 10.
-- `cli_py_lines` <= 350 for `tools/codex_termux/cli.py` after command-group split.
+- `lib_lines` <= 80 unless loader clarity would suffer.
+- `install_runtime_lines` <= 375.
+- `domain_shell_lines` <= 1450.
+- `lib_shell_functions` <= 85.
+- `runtime_shell_lines` <= 450.
+- `state_shell_lines` <= 220.
+- `notify_shell_lines` <= 180.
+- `profile_shell_lines` <= 220.
+- `notify_shell_functions` <= 8.
+- `profile_shell_functions` <= 7.
+- `cli_py_lines` <= 250 for `tools/codex_termux/cli.py` after command-group split.
 
 These are aggressive targets. Do not hit them by making shell obscure. If a
 shell area remains above target, the exception must identify exactly which
@@ -232,7 +237,7 @@ Acceptance:
 - Any remaining over-budget shell area has an explicit short-term exception
   with a reason and a follow-up target.
 - Shell remains execution glue; policy does not move back into shell.
-- Thin wrapper philosophy score is at least 98.9.
+- Thin wrapper philosophy score is at least 99.45.
 
 ### Phase 3: Runtime and State Shell Reduction
 
@@ -331,7 +336,7 @@ Acceptance:
 - command behavior remains unchanged.
 - existing shell callers do not need broad rewrites.
 - Python module ownership is clear enough to audit.
-- Refactor quality score is at least 99.2.
+- Refactor quality score is at least 99.6.
 
 ### Phase 6: Manifest and Audit Upgrade
 
@@ -385,7 +390,7 @@ Acceptance:
 - tests fail if `doctor --json` omits critical status/hash/wrapper fields.
 - tests prove auto-update and network checks are disabled during final smoke.
 - `tests/run-all.sh` remains the final local gate.
-- Product validation confidence score is at least 99.6.
+- Product validation confidence score is at least 99.8.
 
 ### Phase 8: Commit Stack and Merge Hygiene
 
@@ -401,7 +406,7 @@ Acceptance:
 - final branch can be merged without carrying temporary proof-only commits if
   the user chooses squash.
 - no direct push or PR action happens unless the user explicitly asks.
-- Merge candidate maturity score is at least 99.3.
+- Merge candidate maturity score is at least 99.65.
 
 ## Phase-by-Phase Checkpoints
 
@@ -460,8 +465,8 @@ explicitly allowed product-local references, if any.
 ## Acceptance Ledger
 
 - [x] Phase 0 external goal ledger complete.
-- [ ] Phase 1 product purity cleanup complete.
-- [ ] Phase 2 90%-target shell budgets implemented.
+- [x] Phase 1 product purity cleanup complete.
+- [ ] Phase 2 95%-target shell budgets implemented.
 - [ ] Phase 3 runtime/state shell reduction complete.
 - [ ] Phase 4 install runtime slimming complete.
 - [ ] Phase 5 Python CLI de-monolith complete.
@@ -469,34 +474,38 @@ explicitly allowed product-local references, if any.
 - [ ] Phase 7 validation confidence upgrade complete.
 - [ ] Phase 8 merge hygiene complete.
 - [x] `humtr/codex` has no in-repo `GOAL.md`.
-- [ ] `humtr/codex` remains product-only.
+- [x] `humtr/codex` remains product-only.
 - [ ] public `codex` behavior preserved.
 - [ ] `codex termux` compatibility preserved.
 - [ ] installed wrapper matches final local commit.
 - [ ] final validation passes.
-- [ ] goal record hygiene score is at least 99.8.
-- [ ] thin wrapper philosophy score is at least 98.9.
-- [ ] refactor quality score is at least 99.2.
-- [ ] product validation confidence score is at least 99.6.
-- [ ] merge candidate maturity score is at least 99.3.
+- [x] goal record hygiene score is at least 99.9.
+- [ ] thin wrapper philosophy score is at least 99.45.
+- [ ] refactor quality score is at least 99.6.
+- [ ] product validation confidence score is at least 99.8.
+- [ ] merge candidate maturity score is at least 99.65.
 - [ ] no network-dependent command used unless explicitly authorized.
 - [x] no branch pushed unless explicitly authorized.
 
 ## Not Proven Yet
 
-- Whether the 90%-target shell budgets can all be reached without making the
+- Whether the 95%-target shell budgets can all be reached without making the
   wrapper less clear.
-- Whether `cli.py` can be reduced to <= 350 lines without excessive import
+- Whether `cli.py` can be reduced to <= 250 lines without excessive import
   complexity.
 - Whether all tuple/mismatch tests can be made stable across local Termux
   environments.
 - Whether a squash-ready final branch is preferable to preserving the local
   checkpoint history.
+- Whether the 95% line-count budgets should be treated as strict merge blockers
+  or as hard targets with documented Termux-glue exceptions.
 
 ## Resume Notes
 
-Start from `humtr/codex` branch `refactor/python-boundary-expansion` unless the
-user chooses a new branch. Treat this external file as the canonical goal.
+Start from `humtr/codex` `main` at or after `80f7d8c`, then create a new
+hardening branch such as `refactor/wrapper-purity-hardening`. Treat this
+external file as the canonical goal.
 
-First action inside the product repo should be deleting `GOAL.md` and proving
-that no generic automation material remains.
+First action inside the product repo should be measuring the merged main state,
+confirming no generic automation material remains, and then implementing the
+95% hardening phases as product-only commits.
