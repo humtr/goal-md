@@ -163,10 +163,9 @@ thinner, clearer, more product-local, or better proven.
 
 Recommended branch policy:
 
-1. Continue from `refactor/python-boundary-expansion` only if the user wants to
-   keep the existing branch stack.
-2. Otherwise create a follow-up branch such as
-   `refactor/wrapper-purity-hardening` from the current local state.
+1. Work on `refactor/wrapper-purity-hardening`, created from merged `main`
+   commit `80f7d8c`.
+2. Keep `main` stable while hardening proceeds on the branch.
 3. Do not merge to `main` until Phase 8 proves the stack is clean.
 4. Do not push unless the user explicitly asks.
 
@@ -332,7 +331,8 @@ Detailed work items:
 
 Acceptance:
 
-- `tools/codex_termux/cli.py` <= 350 lines.
+- `tools/codex_termux/cli.py` <= 250 lines, or any remaining excess is
+  explicitly justified as parser/dispatch glue after domain command extraction.
 - command behavior remains unchanged.
 - existing shell callers do not need broad rewrites.
 - Python module ownership is clear enough to audit.
@@ -408,6 +408,27 @@ Acceptance:
 - no direct push or PR action happens unless the user explicitly asks.
 - Merge candidate maturity score is at least 99.65.
 
+## Implementation Order
+
+Use this order unless current code evidence contradicts it:
+
+1. Phase 6 first, in a non-destructive way: extend audit metrics to report the
+   new 95% targets before making large reductions. Initial failures are allowed
+   only while local work is in progress.
+2. Phase 5 second: split `cli.py` into command-group modules so Python does not
+   become the new monolith.
+3. Phase 7 early: add drift tests for installed wrapper metadata, tuple update,
+   doctor fields, and network-disabled smoke invariants before aggressive
+   deletion.
+4. Phase 3 next: shrink `runtime.sh` and `state.sh` by moving parse/decide/render
+   logic to Python.
+5. Phase 4 next: slim `bin/install-runtime.sh` after install-plan coverage is
+   strong enough.
+6. Phase 2 becomes final enforcement: tighten budgets only after the preceding
+   work proves the targets or documented exceptions.
+7. Phase 8 closes the branch with merge hygiene, final proof, and a concise
+   PR-ready summary.
+
 ## Phase-by-Phase Checkpoints
 
 Each phase should end with a local checkpoint summary containing:
@@ -457,10 +478,14 @@ git status --short --branch
 find .github -maxdepth 3 -type f 2>/dev/null | sort
 rg -n "GOAL.md|merge-readiness|handoff|NEXT_AGENT_PROMPT|OpenAI API|GitHub API|workflow_dispatch|agent loop" \
   . --glob '!.git/**'
+wc -l lib/codex-termux.sh bin/install-runtime.sh lib/codex-termux/*.sh tools/codex_termux/cli.py
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools \
+  python3 -B -m codex_termux.cli canon-audit --root . --strict
 ```
 
 The final `rg` command should return no product-repo contamination except
-explicitly allowed product-local references, if any.
+explicitly allowed product-local references, if any. The final audit output
+should prove the 95% metrics or list explicit, narrow Termux-glue exceptions.
 
 ## Acceptance Ledger
 
@@ -502,9 +527,9 @@ explicitly allowed product-local references, if any.
 
 ## Resume Notes
 
-Start from `humtr/codex` `main` at or after `80f7d8c`, then create a new
-hardening branch such as `refactor/wrapper-purity-hardening`. Treat this
-external file as the canonical goal.
+Start from `humtr/codex` branch `refactor/wrapper-purity-hardening`, which was
+created from merged `main` at `80f7d8c`. Treat this external file as the
+canonical goal.
 
 First action inside the product repo should be measuring the merged main state,
 confirming no generic automation material remains, and then implementing the
