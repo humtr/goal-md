@@ -31,24 +31,29 @@ this repository instead:
 goals/<repo>-goal.md
 ```
 
-Register reusable goals in `goals/index.json` so agents can use short names
-instead of full paths. The first registered alias is `codex`, which tracks
-follow-up hardening for `humtr/codex` while keeping that repository product-only.
+Register reusable goals in `goals/index.json` so agents can use file-based
+identifiers instead of full paths. The primary goal file for Codex is
+`codex-goal.md`, which tracks follow-up hardening for `humtr/codex` while
+keeping that repository product-only.
 
 Human-friendly forms supported by the skill:
 
 ```text
-/goal codex
-/goal resume codex
-goal codex
+/goal codex-goal.md
+/goal resume codex-goal.md
+goal codex-goal.md
 ```
 
 Resolver utility:
 
 ```bash
-python3 scripts/resolve_goal.py codex
-python3 scripts/resolve_goal.py codex --field resume-prompt
+python3 scripts/resolve_goal.py codex-goal.md
+python3 scripts/resolve_goal.py codex-goal.md --field resume-prompt
 ```
+
+The `resume-prompt` form intentionally prints the file-based command, for
+example `/goal resume codex-goal.md`, while the default form prints the
+canonical goal file path for agents that need to read it.
 
 ## Validation
 

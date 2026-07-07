@@ -21,12 +21,17 @@ a long-running goal ledger, keep the canonical goal outside that repository as
 case, treat the external goal file as canonical and keep only product-local
 material in the target repository.
 
-Human-friendly goal aliases are supported through `goals/index.json`. If the
-user writes `/goal codex`, `/goal resume codex`, `goal codex`, or otherwise
-provides a short goal name instead of a file path, resolve it with
-`scripts/resolve_goal.py <alias>` and then read the returned goal file as
-canonical. If the alias is unknown, list the available aliases from the index
+Human-friendly goal references are file-based. If the user writes
+`/goal codex-goal.md`, `/goal resume codex-goal.md`, `goal codex-goal.md`, or
+otherwise provides a goal file name instead of a path, resolve it with
+`scripts/resolve_goal.py codex-goal.md` and then read the returned goal file as
+canonical. If the file is unknown, list the available goal files from the index
 instead of asking the user to remember a path.
+
+Keep user-facing goal commands file-based when a specific goal file is known. Use absolute goal paths only for
+internal file reads or when the user explicitly asks for the path. When
+offering a resume command, prefer `/goal resume codex-goal.md` over expanding the
+command to an abstract alias.
 
 ## Workflow
 

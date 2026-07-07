@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "goals": {
-    "codex": {
+    "codex-goal.md": {
       "path": "goals/codex-goal.md",
       "repository": "/data/data/com.termux/files/home/prj/codex",
       "branch": "refactor/wrapper-purity-hardening",

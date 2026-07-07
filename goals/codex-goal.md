@@ -2,8 +2,8 @@
 
 ## Objective
 
-Raise the completed Python boundary expansion branch from a strong merge
-candidate into a near-ideal thin, product-only Termux Codex wrapper.
+Raise the current `main` branch into a near-ideal thin, product-only Termux
+Codex wrapper.
 
 This goal intentionally lives outside `humtr/codex` as
 `/data/data/com.termux/files/home/prj/goal-md/goals/codex-goal.md`. The codex product
@@ -35,15 +35,15 @@ constraints or reviewability.
 
 Baseline branch:
 
-- `refactor/python-boundary-expansion`
-- Latest pushed main commit at 95% goal lift: `80f7d8c Externalize codex goal ledger`
+- `main`
+- Latest pushed main commit at this goal lift: `56d6704 Read auto-update state through Python plans`
 - Main merge proof:
-  - `refactor/python-boundary-expansion` fast-forwarded into `main`
-  - `main` pushed to `origin/main` through `80f7d8c`
-  - `GOAL.md` removed from `humtr/codex`
+  - `refactor/wrapper-purity-hardening` fast-forwarded into `main`
+  - `main` pushed to `origin/main` through `56d6704`
+  - product goal ledger kept outside `humtr/codex`
   - external goal stored in `humtr/goal-md`
 - Post-merge product proof on `main`:
-  - installed wrapper: `260702-12 (80f7d8ccab8e)`
+  - installed wrapper: `260702-72 (56d6704fd99d)`
   - `bash -n` protected shell/scripts: pass
   - `validate --root .`: pass
   - `canon-audit --strict`: pass, findings `[]`
@@ -52,9 +52,8 @@ Baseline branch:
   - cached rebuild smoke: pass
   - `tests/run-all.sh`: pass
 
-The final product proof for this lifted goal must be rerun after the next
-hardening commits, because the 95% goal is a new quality threshold rather than
-the already-merged Python boundary expansion.
+The final product proof for this lifted goal should be rerun after the next
+hardening commits.
 
 Current measured structure:
 
@@ -68,8 +67,7 @@ Current measured structure:
 - `lib/codex-termux/notify.sh`: 405 lines
 - `tools/codex_termux/cli.py`: 927 lines
 
-These are good enough to merge as a strong branch, but not yet good enough for
-the stricter "thin, pure, finished wrapper" standard.
+These are strong enough to merge, but still not fully at the strict thin-wrapper standard.
 
 ## Hard Boundaries
 
@@ -130,6 +128,70 @@ Python owns:
 - JSON/TOML-like rendering or parsing
 - reusable action vocabulary
 
+
+### Shell Domain Purification Completion Boundary
+
+Shell-domain purification is a completion requirement, not an optional cleanup.
+The goal is not aggressive line-count compression. The goal is a thin,
+structured, maintainable wrapper where shell remains the Termux execution
+substrate and Python owns reusable decisions.
+
+A shell domain is complete only when all of the following are true:
+
+- every public shell path still preserves existing `codex` and `codex termux`
+  behavior.
+- every shell function in `lib/codex-termux/*.sh` and `bin/install-runtime.sh`
+  is classified as one of: dispatch, prompt/input collection, exec/fd wiring,
+  file mutation, lock/trap/temp management, environment setup, or justified
+  Termux glue.
+- option parsing, profile/session/runtime/source selection, hook selection,
+  doctor field derivation, install/rebuild planning, status rendering, JSON/TOML
+  rendering, and reusable validation live in Python wherever practical.
+- interactive shell may collect raw input and print menus, but Python must own
+  interpreting selections whenever the interpretation is reusable policy rather
+  than terminal I/O.
+- non-interactive wrapper commands delegate command parsing and validation to
+  Python command modules unless doing so would make shell execution less clear
+  or less reliable.
+- shell does not duplicate Python-owned vocabularies such as notify hooks,
+  profile identifiers, runtime selection fields, install-plan actions, repair
+  actions, or doctor critical fields.
+- every remaining shell-side `case`, numeric selection, field extraction, or
+  derived decision has a named exception explaining why it is irreducible
+  shell glue.
+- every exception has focused test coverage or is covered by a final Termux
+  smoke gate.
+- line-count budgets are treated as pressure metrics and regression guards, not
+  a license to make shell terse, cryptic, or harder to maintain.
+
+Domain-specific completion requirements:
+
+- `notify.sh`: hook vocabulary, hook selection parsing, non-interactive option
+  parsing, config-env rendering, and system-config rendering are Python-owned;
+  shell keeps only prompt display, file writes, and provider/script invocation.
+- `profile.sh`: profile validation, display names, default/custom semantics,
+  recent profile state, menu-choice interpretation, and runtime selection
+  interpretation are Python-owned; shell keeps terminal prompting, `CODEX_HOME`
+  export/unset boundaries, and final runtime exec.
+- `session.sh`: session selection result parsing, profile-aware resume plan
+  interpretation, and recent-session policy are Python-owned; shell keeps temp
+  file lifecycle and final `exec`/`cd` behavior.
+- `state.sh`: structured path validation, product status fields, UI text,
+  derived status values, and reusable safety decisions are Python-owned; shell
+  keeps safe file mutation wrappers, locks, temp paths, and subprocess bridge.
+- `runtime.sh`: repair/readiness/rebuild action selection, runtime metadata
+  interpretation, tuple/status derivation, and display summaries are
+  Python-owned; shell keeps fd remap, activation probes, binary execution,
+  symlink/copy/chmod mutation, and rollback file operations.
+- `bin/install-runtime.sh`: source resolution, install-plan decisions, option
+  validation, package metadata interpretation, and reusable error/success
+  messages are Python-owned; shell keeps local file operations, builder
+  invocation, launcher install, chmod, symlink, and activation calls.
+
+This gate is not complete if a shell domain is merely smaller. It is complete
+only when the remaining shell is plainly execution glue, with any residual
+policy documented as a deliberate exception.
+
 ### Network Boundary
 
 Do not use network-dependent commands while implementing unless the user
@@ -163,11 +225,34 @@ thinner, clearer, more product-local, or better proven.
 
 Recommended branch policy:
 
-1. Work on `refactor/wrapper-purity-hardening`, created from merged `main`
-   commit `80f7d8c`.
+1. Work on a fresh branch created from `main`.
 2. Keep `main` stable while hardening proceeds on the branch.
-3. Do not merge to `main` until Phase 8 proves the stack is clean.
+3. Do not merge to `main` until the remaining hardening phases are complete and verified.
 4. Do not push unless the user explicitly asks.
+
+Recommended model operating structure:
+
+Use exactly one primary frontier model and, when delegation is useful, exactly
+one low-cost implementation subagent.
+
+- Primary frontier model owns orchestration, goal interpretation, branch/commit
+  policy, product-boundary enforcement, hard architectural judgment, acceptance
+  gates, final smoke/merge/push decisions, and any work estimated above 7.5/10
+  difficulty.
+- The 5.4 mini high subagent may be used for bounded implementation work at or
+  below 7.5/10 difficulty, such as focused test fixes, narrow shell-to-Python
+  plan moves, small module extraction, invariant updates, and local checkpoint
+  preparation.
+- Do not run multiple implementation subagents in parallel for this repo.
+- Do not invoke a separate frontier review subagent by default. The primary
+  frontier model performs the acceptance gate instead.
+- The mini subagent must receive a narrow task, explicit forbidden actions,
+  required focused tests, and a "no push" constraint.
+- Any mini-produced patch must be accepted only after the primary model checks
+  `git diff --check`, focused tests, `canon-audit --strict`, product-boundary
+  constraints, and the relevant portable/Termux gate for the risk level.
+- If a task is above 7.5/10 difficulty, the primary frontier model should do it
+  directly instead of paying delegation, re-explanation, and re-review overhead.
 
 Scoring rule:
 
@@ -230,11 +315,16 @@ removed.
 
 Acceptance:
 
-- `canon-audit --strict` enforces the new budgets.
+- `canon-audit --strict` enforces the new budgets as regression guards.
 - Audit reports per-file shell line counts for runtime/state/profile/notify.
 - Audit reports `cli.py` line count and fails if it regresses into a monolith.
-- Any remaining over-budget shell area has an explicit short-term exception
-  with a reason and a follow-up target.
+- Every shell domain has a completed classification ledger: dispatch, prompt,
+  exec/fd, file mutation, lock/trap/temp, env setup, or justified Termux glue.
+- Any remaining over-budget shell area has an explicit exception with function
+  names, reason, test coverage, and a follow-up target if the exception is not
+  permanent.
+- No movable shell-side parsing, policy decision, structured rendering, or
+  reusable vocabulary remains in shell.
 - Shell remains execution glue; policy does not move back into shell.
 - Thin wrapper philosophy score is at least 99.45.
 
@@ -491,19 +581,26 @@ should prove the 95% metrics or list explicit, narrow Termux-glue exceptions.
 
 - [x] Phase 0 external goal ledger complete.
 - [x] Phase 1 product purity cleanup complete.
-- [ ] Phase 2 95%-target shell budgets implemented.
+- [ ] Phase 2 95%-target shell budgets and shell-domain classification gate implemented.
 - [ ] Phase 3 runtime/state shell reduction complete.
 - [ ] Phase 4 install runtime slimming complete.
+- [ ] notify shell domain purified: Python owns hook/option/config decisions.
+- [ ] profile shell domain purified: Python owns validation/menu/runtime-selection decisions.
+- [ ] session shell domain purified: Python owns resume-plan/session-state decisions.
+- [ ] state shell domain purified: Python owns derived status/safety/render decisions.
+- [ ] runtime shell domain purified: Python owns readiness/repair/rebuild metadata decisions.
+- [ ] install-runtime shell domain purified: Python owns source/install-plan decisions.
+- [ ] every remaining shell policy exception is named, justified, and test-covered.
 - [ ] Phase 5 Python CLI de-monolith complete.
 - [ ] Phase 6 manifest/audit upgrade complete.
 - [ ] Phase 7 validation confidence upgrade complete.
 - [ ] Phase 8 merge hygiene complete.
 - [x] `humtr/codex` has no in-repo `GOAL.md`.
 - [x] `humtr/codex` remains product-only.
-- [ ] public `codex` behavior preserved.
-- [ ] `codex termux` compatibility preserved.
-- [ ] installed wrapper matches final local commit.
-- [ ] final validation passes.
+- [x] public `codex` behavior preserved.
+- [x] `codex termux` compatibility preserved.
+- [x] installed wrapper matches final local commit.
+- [x] final validation passes.
 - [x] goal record hygiene score is at least 99.9.
 - [ ] thin wrapper philosophy score is at least 99.45.
 - [ ] refactor quality score is at least 99.6.
@@ -515,7 +612,8 @@ should prove the 95% metrics or list explicit, narrow Termux-glue exceptions.
 ## Not Proven Yet
 
 - Whether the 95%-target shell budgets can all be reached without making the
-  wrapper less clear.
+  wrapper less clear; if not, the completion gate requires named shell-glue
+  exceptions rather than obscure compression.
 - Whether `cli.py` can be reduced to <= 250 lines without excessive import
   complexity.
 - Whether all tuple/mismatch tests can be made stable across local Termux
@@ -527,10 +625,85 @@ should prove the 95% metrics or list explicit, narrow Termux-glue exceptions.
 
 ## Resume Notes
 
-Start from `humtr/codex` branch `refactor/wrapper-purity-hardening`, which was
-created from merged `main` at `80f7d8c`. Treat this external file as the
-canonical goal.
+Start from the current `main` branch in `humtr/codex`. Treat this external
+file as the canonical goal.
 
-First action inside the product repo should be measuring the merged main state,
-confirming no generic automation material remains, and then implementing the
-95% hardening phases as product-only commits.
+The current product branch is `refactor/wrapper-final-hardening`, cut from
+`main` to finish the remaining hardening phases as product-only commits. Keep
+`legacy/monolith-maintained` separate as a maintained side line, not the
+primary target.
+
+2026-07-03 current goal alignment:
+
+- active product baseline is `main` at `56d6704 Read auto-update state through Python plans`.
+- `legacy/monolith-maintained` remains a separate maintained line for backports
+  that fit the monolith shape.
+- the current working branch is `refactor/wrapper-final-hardening`, cut from
+  `main` to finish the remaining hardening phases.
+- external goal storage remains in `humtr/goal-md`.
+- current product proof on `main` remains the latest validated proof set:
+  - installed wrapper: `260702-72 (56d6704fd99d)`
+  - `bash -n` protected shell/scripts: pass
+  - `validate --root .`: pass
+  - `canon-audit --strict`: pass, findings `[]`
+  - `tests/run-portable.sh`: pass
+  - `tests/run-termux.sh`: pass
+  - cached rebuild smoke: pass
+  - `tests/run-all.sh`: pass
+- the remaining hardening phases still need to be rerun on the new branch
+  after any fresh structural edits.
+
+Current measured structure from the latest validated `main` state:
+
+- `lib/codex-termux.sh`: 87 lines
+- `bin/install-runtime.sh`: 626 lines
+- domain shell total: 2621 lines
+- shell functions in protected wrapper shell: 175
+- `lib/codex-termux/runtime.sh`: 960 lines
+- `lib/codex-termux/state.sh`: 493 lines
+- `lib/codex-termux/profile.sh`: 434 lines
+- `lib/codex-termux/notify.sh`: 405 lines
+- `tools/codex_termux/cli.py`: 927 lines
+
+These are strong enough to merge, but still not fully at the strict thin-wrapper standard.
+  - `notify_shell_lines`: 142
+  - `profile_shell_lines`: 341
+  - `lib_shell_functions`: 135
+  - `cli_registered_command_count`: 82
+- goal remains incomplete:
+  - `runtime.sh`, `state.sh`, `profile.sh`, and `bin/install-runtime.sh` remain
+    above the aggressive 95% line budgets.
+  - explicit shell-domain exception/classification proof is still required.
+  - final live Termux proof has not been rerun after the latest commits.
+
+## Historical Checkpoints
+
+Recent hardening checkpoints on the branch that led to the current `main`
+baseline were progressively folded into the validated product state:
+
+- checkpoint 3: shell classification became a strict audit contract; 167 shell
+  functions were classified and the portable gate passed.
+- checkpoint 4: profile/use planning moved further into Python; `cli.py`
+  shrank to 62 lines and the profile, session, and CLI surface tests passed.
+- checkpoint 5: status/version text normalization moved to Python; portable
+  validation and runtime-date checks passed while shell budget pressure stayed
+  concentrated in runtime, install, profile, and state.
+- checkpoint 6: auto-update state planning moved to Python; the latest portable
+  gate passed, and the remaining large shell blocks were still in
+  `runtime.sh` and `bin/install-runtime.sh`.
+
+Current validated product evidence on `main` remains:
+
+- installed wrapper: `260702-72 (56d6704fd99d)`
+- `bash -n` protected shell/scripts: pass
+- `validate --root .`: pass
+- `canon-audit --strict`: pass, findings `[]`
+- `tests/run-portable.sh`: pass
+- `tests/run-termux.sh`: pass
+- cached rebuild smoke: pass
+- `tests/run-all.sh`: pass
+
+The remaining hardening work is still expected to focus on the same areas
+listed above: `runtime.sh`, `state.sh`, `profile.sh`, and
+`bin/install-runtime.sh`.
+

@@ -35,8 +35,15 @@ def resolve_goal(root: Path, name: str) -> tuple[str, dict[str, Any]]:
         if not isinstance(entry, dict):
             continue
         path = str(entry.get("path", ""))
-        stem = Path(path).stem
-        if name in {stem, stem.removesuffix("-goal")} or stem.startswith(name):
+        rel_path = Path(path)
+        stem = rel_path.stem
+        if name in {
+            stem,
+            stem.removesuffix("-goal"),
+            rel_path.name,
+            rel_path.as_posix(),
+            path,
+        } or stem.startswith(name):
             matches.append((alias, entry))
 
     if len(matches) == 1:
@@ -75,7 +82,7 @@ def main() -> int:
     elif args.field == "branch":
         print(entry.get("branch", ""))
     elif args.field == "resume-prompt":
-        print(f"/goal resume {abs_path}")
+        print(f"/goal resume {rel_path.name}")
     else:
         print(json.dumps({"alias": alias, **entry, "absolute_path": str(abs_path)}, ensure_ascii=False, indent=2))
     return 0
