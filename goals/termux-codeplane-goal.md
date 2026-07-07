@@ -1,40 +1,85 @@
-# Goal: Termux Codeplane Bootstrap and Full-Code Execution Plane
+# Goal: Termux Codeplane Full Architecture
 
 ## Objective
 
-Create `humtr/termux-codeplane` as the Termux-specific full-code cognition and execution plane for ChatGPT-led development.
+Create `humtr/termux-codeplane` as the Termux-specific full-code cognition and execution plane for ChatGPT-led development, then integrate it with `humtr/termux-mcp` and the existing Worker/tunnel path until the full architecture is proven end to end.
 
 `termux-codeplane` must become the local engine that owns:
 
 - repository mirror and sync
+- canonical repository registry
 - full-code indexing
 - context capsule generation
 - change bundle application
+- recipe execution for deterministic jobs
 - git worktree sandboxing
-- validation
+- validation tiers
 - commit
 - push
-- structured result and observation reporting
+- structured observation/result reporting
+- job/session state
+- audit and replay material
+- integration contracts for MCP and Worker frontends
 
 `humtr/loop` remains the generic PR-ops, handoff, readiness, schema, and workflow-pattern framework. `termux-codeplane` is a Termux-specific implementation derived from those concepts, not a replacement for `humtr/loop`.
 
-`humtr/termux-mcp` remains the ChatGPT-facing MCP bridge. It should eventually become a thin facade that delegates code cognition and execution work to `termux-codeplane`.
+`humtr/termux-mcp` remains the ChatGPT-facing MCP bridge. Its long-term role is to become a thin facade that delegates code cognition and execution work to `termux-codeplane`.
 
-## Canonical Local Path
+## Current Repositories
+
+### Generic framework
+
+```text
+humtr/loop
+```
+
+### Goal registry
+
+```text
+humtr/goal-md
+```
+
+### Termux-specific execution engine
+
+```text
+humtr/termux-codeplane
+```
+
+Canonical local path:
 
 ```text
 /data/data/com.termux/files/home/prj/termux-codeplane
 ```
 
-## Remote Target
+Remote target:
 
 ```text
 git@github.com:humtr/termux-codeplane.git
 ```
 
+### MCP bridge
+
+```text
+humtr/termux-mcp
+```
+
+Canonical source checkout:
+
+```text
+/data/data/com.termux/files/home/prj/termux-mcp
+```
+
+Current live runtime checkout:
+
+```text
+/data/data/com.termux/files/home/work/termux-mcp
+```
+
+The live runtime must remain stable until explicit migration.
+
 ## Goal-Led Agent Loop
 
-This goal is not a passive plan. It is the controlling objective ledger for agent work.
+This goal is not a passive plan. It is the controlling objective ledger for Agent work.
 
 For any Agent run that acts on this goal:
 
@@ -42,12 +87,14 @@ For any Agent run that acts on this goal:
 2. Read the goal before planning edits.
 3. Create or update the target repository `GOAL.md` from this goal.
 4. Treat the target repository `GOAL.md` as the live execution contract after the repository exists.
-5. At the start of each phase, update `GOAL.md` with the current phase and intended checkpoint.
+5. At the start of each phase, update `GOAL.md` with the current phase, intended checkpoint, and first incomplete acceptance item.
 6. At the end of each phase, update `GOAL.md` with actual results, validation evidence, pushed commit, blockers, and the next phase.
 7. If implementation evidence changes the plan, update `GOAL.md` first or in the same commit as the implementation that changes the plan.
 8. Never replace the goal with hidden reasoning. Store only public, reviewable facts: decisions, evidence, blockers, result summaries, and next actions.
 9. On resume, read `GOAL.md`, locate the first incomplete acceptance item, and continue from there.
 10. Do not stop simply because a checkpoint was pushed. Stop only under the stop conditions below.
+11. If an Agent invocation cannot finish all remaining phases, it must update `GOAL.md` with exact resume instructions before stopping.
+12. If the user asks `/goal termux-codeplane`, the next agent must use this file as the single source of durable objective state.
 
 The purpose of this protocol is to increase work persistence across Agent invocations. `GOAL.md` is the single durable objective state, not merely documentation.
 
@@ -55,67 +102,23 @@ The purpose of this protocol is to increase work persistence across Agent invoca
 
 This goal is not complete after the first successful bootstrap.
 
-Do not stop after Phase 1 unless a hard blocker occurs.
-
-After completing and pushing Phase 1, continue to Phase 2 in the same working session if possible.
-
-After completing and pushing Phase 2, continue to Phase 3 in the same working session if possible.
-
-Only stop when one of these is true:
-
-1. Phase 3 is completed, validated, committed, pushed, and final status is clean.
-2. A platform, authentication, repository-creation, validation, or push blocker prevents further safe progress.
-3. The user explicitly cancels the task.
-4. Continuing would require a destructive operation forbidden by this goal.
-
 A successful Phase 1 push is a checkpoint, not a final answer.
 
 A successful Phase 2 push is a checkpoint, not a final answer.
 
-The final target for the first agent run is Phase 3 unless blocked.
+A successful Phase 3 push is a checkpoint, not a final answer.
 
-## Repository Roles
+The full architecture is not complete until Phase 12 is complete, unless the user explicitly narrows scope.
 
-### `humtr/loop`
+For the first Agent run, the minimum target is Phase 3 unless blocked. If Phase 3 completes and time/tooling remains available, continue to Phase 4 and beyond.
 
-Generic framework repository.
+Only stop when one of these is true:
 
-Owns:
-
-- reusable PR-loop patterns
-- generic handoff/readiness concepts
-- generic schemas and examples
-- cross-repo operation philosophy
-- reference material only
-
-Must remain unchanged during this task.
-
-### `humtr/termux-codeplane`
-
-New Termux-specific implementation repository.
-
-Owns:
-
-- Termux local repo mirror
-- code index
-- context capsule builder
-- change bundle executor
-- worktree sandbox
-- validation runner
-- commit and push execution
-- result and observation artifacts
-
-### `humtr/termux-mcp`
-
-Existing MCP bridge.
-
-Short-term goal: keep the existing runtime in `~/work/termux-mcp` operational while preparing a canonical checkout at `~/prj/termux-mcp`.
-
-Do not move or refactor `~/work/termux-mcp` during Phase 1.
-
-Do not migrate the live MCP runtime from `~/work` to `~/prj` during this goal unless a later explicit task says so.
-
-During this goal, `termux-mcp` is referenced as the future integration target and as a repository that should eventually live under `~/prj`.
+1. All phases through Phase 12 are completed, validated, committed, pushed, and final status is clean.
+2. A platform, authentication, repository-creation, validation, push, or runtime blocker prevents further safe progress.
+3. The user explicitly cancels or narrows the task.
+4. Continuing would require a destructive operation forbidden by this goal.
+5. Continuing would require live runtime migration without explicit approval.
 
 ## Hard Boundaries
 
@@ -137,29 +140,27 @@ Forbidden:
 
 ### Preserve Existing MCP Runtime
 
-Do not move, delete, or rewrite:
+Do not move, delete, or rewrite the live runtime checkout during bootstrap and codeplane development:
 
 ```text
 /data/data/com.termux/files/home/work/termux-mcp
 ```
 
-Do not change the current Cloudflare Worker, tunnel, or MCP registration during Phase 1 or Phase 2.
+Do not change the current Cloudflare Worker, tunnel, or live MCP registration before the dedicated migration phase.
 
 ### Prepare Canonical MCP Checkout
 
-A canonical checkout at this path is desirable:
+A canonical source checkout is required:
 
 ```text
 /data/data/com.termux/files/home/prj/termux-mcp
 ```
 
-Preparing that checkout is allowed only if it is a clone or clean checkout operation that does not disturb the live runtime under `~/work/termux-mcp`.
-
-Do not switch the running MCP server to the `~/prj` checkout during this goal unless explicitly authorized.
+This checkout may be created, updated, validated, and pushed. It must not replace the live runtime until explicit migration.
 
 ### Push Policy
 
-Push is included in this task.
+Push is included in this goal.
 
 Allowed:
 
@@ -196,6 +197,18 @@ Cloudflare keys
 SSH private keys
 ```
 
+### Safety of Live Service
+
+Any live service change must have a rollback path.
+
+Before modifying live MCP or Worker routing, record:
+
+- current running path
+- current commit
+- current process/session status
+- current Worker backend target
+- rollback command or manual rollback steps
+
 ## Execution Strategy
 
 Work in phases, but do not treat phase boundaries as stopping points.
@@ -210,7 +223,7 @@ Each phase must end with:
 - remote verification where practical
 - short checkpoint note
 
-Then continue to the next phase immediately.
+Then continue to the next phase immediately when safe.
 
 If validation fails:
 
@@ -232,94 +245,51 @@ If push fails:
 
 ### Goal
 
-Prepare local repository placement without disrupting the live MCP runtime.
+Solidify repository placement and remote availability without disrupting the live MCP runtime.
 
 ### Required Work
 
 - Verify `git`, `python3`, and `gh` are available.
 - Verify GitHub CLI authentication.
 - Verify `~/prj` exists.
-- Verify whether `~/prj/goal-md` exists; if absent, clone or fetch it so the external goal can be read locally.
-- Verify whether `humtr/termux-codeplane` exists remotely.
-- Verify whether `~/prj/termux-mcp` exists.
-- If `~/prj/termux-mcp` does not exist, create a non-live canonical clone of `humtr/termux-mcp` there.
-- Do not alter the live MCP server path.
+- Verify `~/prj/goal-md` exists and can resolve alias `termux-codeplane`.
+- Verify `humtr/termux-codeplane` exists remotely.
+- Verify `humtr/termux-mcp` exists remotely.
+- Verify `~/prj/termux-mcp` exists as a non-live source checkout.
+- Verify `~/prj/termux-codeplane` exists as a local checkout or empty initialized repo.
+- Verify `~/work/termux-mcp` remains unchanged and live.
+- Record the preflight report path in `GOAL.md`.
+
+### Current Evidence
+
+- [x] `humtr/termux-codeplane` exists as a private repository.
+- [x] `humtr/termux-mcp` exists as a private repository.
+- [x] `humtr/goal-md` contains alias `termux-codeplane`.
+- [x] User reported repository preflight was completed.
+- [ ] Agent must still verify local paths and statuses at run start.
 
 ### Acceptance
 
 - [ ] Tooling verified.
 - [ ] `~/prj` exists.
 - [ ] external goal is readable locally or from GitHub.
-- [ ] `~/prj/termux-mcp` is present as a non-live checkout, or a blocker explains why it could not be created.
+- [ ] `~/prj/termux-mcp` is present as a non-live checkout.
+- [ ] `~/prj/termux-codeplane` is present.
 - [ ] `~/work/termux-mcp` remains unchanged and live.
+- [ ] Phase 0 result is recorded in target repo `GOAL.md`.
 
-## Phase 1: Bootstrap Repository and Project Identity
+## Phase 1: Bootstrap `termux-codeplane` Repository Identity
 
 ### Goal
 
-Create `humtr/termux-codeplane` as a pushed GitHub repository with clear project identity, architecture docs, schemas, examples, and a minimal validation surface.
+Create a pushed repository with clear project identity, architecture docs, schemas, examples, Python skeleton, and minimal validation tooling.
 
-### Required Work
-
-1. Create local repository:
-
-```text
-~/prj/termux-codeplane
-```
-
-2. Create `GOAL.md` in the repository from this goal, including a live progress ledger.
-
-3. Create or connect remote repository:
-
-```text
-humtr/termux-codeplane
-```
-
-Use `gh repo create` if the remote does not exist.
-
-4. Add project identity files:
+### Required Files
 
 ```text
 README.md
 GOAL.md
-docs/architecture.md
-docs/runtime-model.md
-docs/push-policy.md
-docs/derived-from-loop.md
-docs/goal-loop.md
-```
-
-5. Add core schema files:
-
-```text
-schemas/project-manifest.schema.json
-schemas/context-request.schema.json
-schemas/context-capsule.schema.json
-schemas/change-bundle.schema.json
-schemas/execution-observation.schema.json
-schemas/job-result.schema.json
-schemas/codeplane-session.schema.json
-```
-
-6. Add example files:
-
-```text
-examples/context-request.sample.json
-examples/context-capsule.sample.json
-examples/change-bundle.sample.json
-examples/job-result.sample.json
-```
-
-7. Add minimal validation tooling:
-
-```text
-tools/codeplane_validate.py
 Makefile
-```
-
-8. Add initial Python package skeleton:
-
-```text
 codeplane/__init__.py
 codeplane/cli.py
 codeplane/config.py
@@ -331,52 +301,51 @@ codeplane/worktree.py
 codeplane/validation.py
 codeplane/gitops.py
 codeplane/result.py
+tools/codeplane_validate.py
+docs/architecture.md
+docs/runtime-model.md
+docs/push-policy.md
+docs/derived-from-loop.md
+docs/goal-loop.md
+schemas/project-manifest.schema.json
+schemas/repo-registry.schema.json
+schemas/context-request.schema.json
+schemas/context-capsule.schema.json
+schemas/change-bundle.schema.json
+schemas/execution-observation.schema.json
+schemas/job-result.schema.json
+schemas/codeplane-session.schema.json
+examples/context-request.sample.json
+examples/context-capsule.sample.json
+examples/change-bundle.sample.json
+examples/job-result.sample.json
 ```
 
-At Phase 1, these modules may be skeletal, but they must be syntactically valid and must clearly state their responsibility.
+### Required Validation
 
-### Phase 1 Validation
-
-Run:
-
-```bash
-python3 -m py_compile $(find codeplane tools -name '*.py' | sort)
+```text
+python3 -m py_compile all Python files
 python3 tools/codeplane_validate.py
 git status --short --branch
 ```
 
-### Phase 1 Commit
-
-Commit message:
+### Commit
 
 ```text
 Initialize termux-codeplane
 ```
 
-### Phase 1 Push
+### Acceptance
 
-Push to:
-
-```text
-origin/main
-```
-
-### Phase 1 Acceptance
-
-- [ ] `~/prj/termux-codeplane` exists.
-- [ ] `humtr/termux-codeplane` exists.
-- [ ] remote uses SSH.
-- [ ] README explains the project.
-- [ ] GOAL.md exists and says Phase 1 is not the final stop.
-- [ ] GOAL.md includes live progress/current-state fields.
-- [ ] architecture docs exist.
-- [ ] all required schemas exist.
-- [ ] all required examples exist.
+- [ ] Repository identity files exist.
+- [ ] `GOAL.md` exists as live progress ledger.
+- [ ] Architecture docs exist.
+- [ ] All required schemas exist.
+- [ ] All required examples exist.
 - [ ] Python files compile.
-- [ ] `tools/codeplane_validate.py` passes.
-- [ ] commit is pushed to `origin/main`.
-- [ ] final local status is clean.
-- [ ] continue to Phase 2 unless blocked.
+- [ ] Validation tool passes.
+- [ ] Commit is pushed.
+- [ ] Local status is clean.
 
 ## Phase 2: Code Cognition MVP
 
@@ -384,21 +353,7 @@ origin/main
 
 Implement the minimum useful local code cognition engine.
 
-`termux-codeplane` must be able to inspect a local git repository and generate compact context capsules for ChatGPT coding work.
-
-### Required Work
-
-Implement or improve:
-
-```text
-codeplane/repo.py
-codeplane/indexer.py
-codeplane/context.py
-codeplane/cli.py
-codeplane/result.py
-```
-
-CLI commands required by the end of Phase 2:
+### Required Commands
 
 ```text
 python3 -m codeplane.cli inspect-project --repo <path>
@@ -407,105 +362,61 @@ python3 -m codeplane.cli prepare-context --request <json> --out <json>
 python3 -m codeplane.cli validate-self
 ```
 
-### Phase 2 MVP Capabilities
+### MVP Capabilities
 
-`inspect-project` should report:
+`inspect-project` reports:
 
 - repo path
-- whether it is a git repo
+- git repo status
 - current branch
 - current HEAD
 - clean/dirty status
-- remote URL if available
-- package manager hints if available
-- known validation scripts if available
+- remote URL
+- package manager hints
+- known validation scripts
 
-`build-index` should generate a JSON index with:
+`build-index` generates:
 
 - file manifest
 - file sizes
 - sha256 hashes
 - basic language classification
 - package scripts when `package.json` exists
-- recent commit summary when available
+- recent commit summary
+- ignored file awareness
 
-`prepare-context` should produce a context capsule with:
+`prepare-context` generates:
 
 - base HEAD
 - repo cleanliness
 - relevant file list
 - relevant search matches
-- selected file slices or full small files
+- selected slices or small full files
 - sha guards
 - context completeness status
 
-This does not need tree-sitter or full symbol graph yet. Literal search and file slices are acceptable for MVP.
-
-### Phase 2 Validation
-
-Run:
-
-```bash
-python3 -m py_compile $(find codeplane tools -name '*.py' | sort)
-python3 tools/codeplane_validate.py
-python3 -m codeplane.cli validate-self
-python3 -m codeplane.cli inspect-project --repo .
-python3 -m codeplane.cli build-index --repo . --out .codeplane-index.sample.json
-python3 -m codeplane.cli prepare-context --request examples/context-request.sample.json --out .context-capsule.sample.out.json
-git status --short --branch
-```
-
-Generated sample output files may be removed before commit unless intentionally kept under `examples/`.
-
-### Phase 2 Commit
-
-Commit message:
+### Commit
 
 ```text
 Add code cognition MVP
 ```
 
-### Phase 2 Push
+### Acceptance
 
-Push to:
-
-```text
-origin/main
-```
-
-### Phase 2 Acceptance
-
-- [ ] `inspect-project` works on `termux-codeplane` itself.
-- [ ] `build-index` works on `termux-codeplane` itself.
-- [ ] `prepare-context` produces a valid context capsule.
-- [ ] `GOAL.md` records Phase 2 result and next action.
-- [ ] validation passes.
-- [ ] commit is pushed.
-- [ ] local status is clean.
-- [ ] continue to Phase 3 unless blocked.
+- [ ] `inspect-project` works on `termux-codeplane`.
+- [ ] `build-index` works on `termux-codeplane`.
+- [ ] `prepare-context` produces valid capsule.
+- [ ] Context capsule has base/head/hash guards.
+- [ ] `GOAL.md` records Phase 2 result.
+- [ ] Commit is pushed.
 
 ## Phase 3: Change Bundle Execution MVP
 
 ### Goal
 
-Implement the minimum useful deterministic executor for ChatGPT-generated change bundles.
+Implement deterministic execution of ChatGPT-generated change bundles.
 
-`termux-codeplane` must be able to apply a structured change bundle in a safe git worktree, validate it, commit it, push it, and report the result.
-
-### Required Work
-
-Implement or improve:
-
-```text
-codeplane/bundle.py
-codeplane/worktree.py
-codeplane/validation.py
-codeplane/gitops.py
-codeplane/result.py
-codeplane/cli.py
-```
-
-CLI commands required by the end of Phase 3:
+### Required Commands
 
 ```text
 python3 -m codeplane.cli execute-bundle --bundle <json>
@@ -513,158 +424,322 @@ python3 -m codeplane.cli read-result --result <json>
 python3 -m codeplane.cli validate-self
 ```
 
-### Change Bundle Requirements
+### Required Capabilities
 
-A change bundle must support at least:
+- edit operations: create, append, replace
+- base HEAD guard
+- file hash guard
+- optional dry-run mode
+- validation tiers: none, self, standard
+- result JSON
+- commit policy
+- push policy
+- refusal on force push/tag push/remote deletion
 
-```text
-operation: create
-operation: append
-operation: replace
-```
-
-Each edit must include:
-
-- path
-- operation
-- content for create/append
-- search and replace for replace
-- optional expected sha256 guard
-
-Bundle-level fields must include:
-
-- project or repo path
-- base HEAD
-- validation tier or checks
-- checkpoint policy
-- commit message
-- push flag
-
-### Worktree Policy
-
-Execution should use a temporary git worktree or an equivalent safe isolated path.
-
-Main working tree must remain clean on validation failure.
-
-If worktree implementation is not fully complete in Phase 3, the code must clearly mark the limitation and default to a non-destructive dry-run unless execution is explicitly requested.
-
-### Validation Policy
-
-At minimum support:
-
-```text
-validation tier: none
-validation tier: self
-validation tier: standard
-```
-
-For `termux-codeplane` itself:
-
-```text
-self:
-  python compile
-  tools/codeplane_validate.py
-
-standard:
-  self + CLI smoke commands
-```
-
-### Commit and Push Policy
-
-If validation passes and the bundle requests commit/push:
-
-1. commit the change
-2. push to `origin/main`
-3. verify remote main where practical
-
-Do not force push.
-
-### Phase 3 Validation
-
-Run:
-
-```bash
-python3 -m py_compile $(find codeplane tools -name '*.py' | sort)
-python3 tools/codeplane_validate.py
-python3 -m codeplane.cli validate-self
-python3 -m codeplane.cli inspect-project --repo .
-python3 -m codeplane.cli build-index --repo . --out .codeplane-index.sample.json
-python3 -m codeplane.cli prepare-context --request examples/context-request.sample.json --out .context-capsule.sample.out.json
-```
-
-Then perform one safe self-proof if practical:
-
-- create a change bundle that appends a harmless ignored sample output path to `.gitignore`, or
-- create/update a small example file under `examples/`, or
-- run execute-bundle in dry-run mode if a real self-change is too risky.
-
-The self-proof must not force push.
-
-### Phase 3 Commit
-
-Commit message:
+### Commit
 
 ```text
 Add change bundle execution MVP
 ```
 
-### Phase 3 Push
-
-Push to:
-
-```text
-origin/main
-```
-
-### Phase 3 Acceptance
+### Acceptance
 
 - [ ] `execute-bundle` exists.
-- [ ] create/append/replace operations are represented.
-- [ ] base HEAD guard is represented.
-- [ ] file hash guard is represented or explicitly stubbed with a clear TODO.
+- [ ] create/append/replace operations work or are clearly guarded.
+- [ ] base HEAD guard exists.
+- [ ] file hash guard exists or has explicit TODO and refusal semantics.
 - [ ] validation tiers exist.
-- [ ] result JSON is produced.
-- [ ] commit and push policy is implemented or clearly guarded behind explicit flags.
-- [ ] `GOAL.md` records Phase 3 result and next action.
-- [ ] validation passes.
-- [ ] commit is pushed.
-- [ ] local status is clean.
-- [ ] final report is written.
+- [ ] result JSON is emitted.
+- [ ] commit/push policy is implemented or explicitly gated.
+- [ ] safe self-proof is performed.
+- [ ] Commit is pushed.
 
-## Phase 4: MCP Integration and Live Runtime Preparation
+## Phase 4: Repository Registry, Mirror, and Sync
 
-Do not start Phase 4 unless Phase 3 is completed or the user explicitly asks.
+### Goal
 
-Future goal:
+Move from ad hoc repo paths to a durable registry and mirror/sync model.
 
-- add `termux-mcp` wrappers for:
-  - `prepare_coding_context`
-  - `execute_change_bundle`
-  - `read_job_result`
-- keep `termux-mcp` thin
-- preserve the live `~/work/termux-mcp` runtime until migration is explicitly approved
-- prepare `~/prj/termux-mcp` as the canonical source checkout
+### Required Work
 
-## Architecture Completion Checklist
+- Add repo registry schema and storage.
+- Support registering repos under `~/prj`.
+- Track repo name, full_name, local_path, default_branch, remote URL, safe execution policy, validation profile.
+- Implement sync command.
+- Implement clean/dirty/ref mismatch checks.
+- Implement base ref drift detection.
+- Support `termux-codeplane` and `termux-mcp` as first-class registered projects.
 
-The final architecture is not complete until all of the following exist and are proven:
+### Required Commands
+
+```text
+python3 -m codeplane.cli register-repo --name <name> --path <path>
+python3 -m codeplane.cli list-repos
+python3 -m codeplane.cli sync-repo --name <name>
+python3 -m codeplane.cli inspect-project --name <name>
+```
+
+### Acceptance
+
+- [ ] Registry exists.
+- [ ] `termux-codeplane` registered.
+- [ ] `termux-mcp` registered.
+- [ ] Sync does not run destructive operations.
+- [ ] Dirty repo refuses unsafe execution.
+- [ ] Base ref drift is reported.
+
+## Phase 5: Worktree Isolation and Promotion
+
+### Goal
+
+Make bundle execution safe by default using isolated worktrees.
+
+### Required Work
+
+- Create temporary worktree for execution.
+- Apply bundle in worktree.
+- Validate in worktree.
+- Commit in worktree or promote patch back to canonical branch safely.
+- Push only after validation.
+- Keep main working tree clean on failure.
+- Store execution artifacts.
+- Add cleanup policy for old worktrees.
+
+### Acceptance
+
+- [ ] Worktree execution path exists.
+- [ ] Validation failure leaves canonical checkout clean.
+- [ ] Successful execution can commit and push.
+- [ ] Failed execution produces observation JSON.
+- [ ] Worktree cleanup is implemented.
+
+## Phase 6: Observation, Failure Analysis, and Repair Loop
+
+### Goal
+
+Return structured observations that ChatGPT can use to repair failed changes.
+
+### Required Work
+
+- Normalize failure categories:
+  - context_incomplete
+  - base_head_mismatch
+  - file_hash_mismatch
+  - apply_failed
+  - validation_failed
+  - commit_failed
+  - push_failed
+  - remote_verify_failed
+- Extract diagnostics from Python, Node, shell, git, and generic test output.
+- Emit repair hints without hidden reasoning.
+- Store observations under ignored artifact path.
+
+### Acceptance
+
+- [ ] Observation schema is enforced.
+- [ ] Failed validation emits structured diagnostics.
+- [ ] Push failure preserves local commit and reports exact failure.
+- [ ] Repair loop input can be produced from a failed result.
+
+## Phase 7: Recipe Layer for Deterministic Jobs
+
+### Goal
+
+Add recipes for common deterministic operations while keeping creative coding based on context capsule plus change bundle.
+
+### Required Work
+
+- Define recipe schema.
+- Add recipes for safe common tasks:
+  - append gitignore entry
+  - update docs section
+  - bump version metadata
+  - create example file
+  - cleanup ignored artifacts
+  - run validation only
+- Add recipe dry-run and execution modes.
+- Keep recipe layer subordinate to change-bundle architecture.
+
+### Acceptance
+
+- [ ] Recipe schema exists.
+- [ ] At least three safe recipes exist.
+- [ ] Recipe execution uses same validation/commit/push policy.
+- [ ] Recipe cannot bypass guardrails.
+
+## Phase 8: `termux-mcp` Thin Wrapper Integration
+
+### Goal
+
+Expose codeplane capabilities through `termux-mcp` while keeping MCP thin.
+
+### Required Work
+
+In `humtr/termux-mcp`, add wrapper tools that call `termux-codeplane`:
+
+```text
+prepare_coding_context
+execute_change_bundle
+run_recipe_job
+read_job_result
+cancel_job
+inspect_codeplane
+```
+
+The wrappers must:
+
+- validate inputs
+- call codeplane CLI or local API
+- return structured JSON
+- avoid duplicating codeplane business logic
+- preserve existing p4 transaction tools until replacement is proven
+- not change live runtime until migration phase
+
+### Acceptance
+
+- [ ] `~/prj/termux-mcp` has wrapper implementation.
+- [ ] Existing p4 behavior remains intact.
+- [ ] Wrappers call codeplane rather than duplicating logic.
+- [ ] Wrapper validation passes.
+- [ ] Commit is pushed.
+
+## Phase 9: End-to-End Local Proof
+
+### Goal
+
+Prove the non-live source path end to end before live migration.
+
+### Required Proofs
+
+- Agent/terminal calls codeplane directly for context capsule.
+- Agent/terminal calls codeplane directly for change bundle execution.
+- `termux-mcp` wrapper calls codeplane for context capsule.
+- `termux-mcp` wrapper calls codeplane for change bundle execution.
+- A harmless test change validates, commits, pushes, and emits result JSON.
+
+### Acceptance
+
+- [ ] Direct codeplane proof exists.
+- [ ] MCP wrapper proof exists in non-live checkout.
+- [ ] Remote verification succeeds.
+- [ ] Rollback path documented.
+
+## Phase 10: Live Runtime Migration Plan
+
+### Goal
+
+Prepare but do not blindly execute migration from `~/work/termux-mcp` to `~/prj/termux-mcp`.
+
+### Required Work
+
+- Document current live runtime path.
+- Document current live commit.
+- Document current server start command.
+- Document current Cloudflare/Worker/tunnel relation.
+- Add rollback plan.
+- Add migration checklist.
+- Add post-migration health checks.
+
+### Acceptance
+
+- [ ] Migration doc exists.
+- [ ] Rollback doc exists.
+- [ ] User explicit approval required for live switch.
+- [ ] No live switch happens during planning only.
+
+## Phase 11: Live MCP Migration and Proof
+
+### Goal
+
+After explicit approval, switch live MCP runtime to the canonical `~/prj/termux-mcp` path or otherwise make `~/prj` the source of truth while preserving service availability.
+
+### Required Work
+
+- Stop or quiesce live MCP safely.
+- Record previous live path/commit.
+- Start MCP from approved path.
+- Verify health endpoint.
+- Verify `server_info`.
+- Verify Worker backend connectivity.
+- Run one read-only wrapper proof.
+- Run one safe write proof if authorized.
+- Keep rollback ready.
+
+### Acceptance
+
+- [ ] User explicit approval recorded.
+- [ ] Live server path is correct.
+- [ ] Health checks pass.
+- [ ] Worker route works.
+- [ ] Rollback remains possible.
+- [ ] Final status recorded in `GOAL.md`.
+
+## Phase 12: Production Hardening and Operating Model
+
+### Goal
+
+Make the architecture durable enough for repeated ChatGPT/Agent development work.
+
+### Required Work
+
+- Add job/session store.
+- Add artifact retention policy.
+- Add audit log.
+- Add config file and defaults.
+- Add schema validation to all public commands.
+- Add security guardrails:
+  - safe roots
+  - forbidden path patterns
+  - secret scanning before commit
+  - no force push
+  - no tag push by default
+  - no remote branch deletion
+- Add validation profiles per project.
+- Add regression tests.
+- Add docs for normal operation, failure recovery, and manual override.
+- Decide whether Worker queue/Durable Object/KV is needed now or later.
+- If Worker queue is implemented, document control-plane/data-plane split.
+
+### Acceptance
+
+- [ ] Job/session store exists or deliberate deferral is documented.
+- [ ] Audit log exists.
+- [ ] Artifact retention policy exists.
+- [ ] Security guardrails are enforced.
+- [ ] Secret scan or equivalent pre-commit guard exists.
+- [ ] Validation profiles exist.
+- [ ] Regression tests exist.
+- [ ] Operating docs exist.
+- [ ] Final architecture proof is recorded.
+
+## Full Architecture Completion Checklist
+
+The architecture is not complete until all of the following are true:
 
 - [ ] `termux-codeplane` repository exists and is pushed.
+- [ ] `termux-mcp` repository exists and is pushed.
+- [ ] `goal-md` alias `termux-codeplane` exists.
+- [ ] `termux-codeplane/GOAL.md` exists and is updated as live ledger.
 - [ ] `termux-codeplane` owns mirror/sync.
+- [ ] `termux-codeplane` owns repo registry.
 - [ ] `termux-codeplane` owns repo indexing.
 - [ ] `termux-codeplane` owns context capsule generation.
 - [ ] `termux-codeplane` owns change bundle execution.
+- [ ] `termux-codeplane` owns recipe execution for deterministic jobs.
 - [ ] `termux-codeplane` owns worktree isolation.
 - [ ] `termux-codeplane` owns validation tiers.
 - [ ] `termux-codeplane` owns commit and push policy.
 - [ ] `termux-codeplane` emits structured observations and result JSON.
-- [ ] `GOAL.md` is a live progress ledger and is updated as work advances.
+- [ ] `termux-codeplane` stores job/session state or documents a deliberate deferred design.
 - [ ] `~/prj/termux-mcp` exists as canonical source checkout.
-- [ ] live `~/work/termux-mcp` remains stable until migration.
+- [ ] live `~/work/termux-mcp` remains stable until explicit migration.
 - [ ] `termux-mcp` exposes thin wrappers for codeplane context and bundle operations.
 - [ ] Worker/tunnel/MCP integration path is documented.
-- [ ] force push, tag push, branch deletion, and secret leakage are guarded.
+- [ ] force push, tag push, branch deletion, unsafe paths, and secret leakage are guarded.
 - [ ] end-to-end proof exists: ChatGPT/Agent -> MCP or terminal -> codeplane -> validate -> commit -> push -> result.
+- [ ] live migration plan exists.
+- [ ] live migration is performed only after explicit approval.
+- [ ] production hardening checklist is complete or explicitly deferred with rationale.
 
 ## Required Final Report
 
@@ -682,11 +757,12 @@ Push:
 Final status:
 Blockers:
 Next required action:
+GOAL.md updates:
 ```
 
-If stopped before Phase 3, explain why.
+If stopped before Phase 12, explain why and identify the exact first incomplete acceptance item.
 
-Do not describe Phase 1 as final completion unless Phase 2 and Phase 3 are explicitly blocked or cancelled.
+Do not describe Phase 1, Phase 2, or Phase 3 as final completion.
 
 ## Live Progress Ledger
 
@@ -694,46 +770,42 @@ Initial state:
 
 - [x] external goal created in `humtr/goal-md`.
 - [x] `goals/index.json` registered alias `termux-codeplane`.
-- [x] `humtr/termux-codeplane` remote was checked and did not exist at preflight time.
+- [x] `humtr/termux-codeplane` exists as a private repository.
+- [x] `humtr/termux-mcp` exists as a private repository.
+- [x] User reported repository preflight completed.
+- [ ] Agent must verify local `~/prj` status at start.
 - [ ] target repository `GOAL.md` created.
 - [ ] Phase 0 complete.
 - [ ] Phase 1 complete.
 - [ ] Phase 2 complete.
 - [ ] Phase 3 complete.
+- [ ] Phase 4 complete.
+- [ ] Phase 5 complete.
+- [ ] Phase 6 complete.
+- [ ] Phase 7 complete.
+- [ ] Phase 8 complete.
+- [ ] Phase 9 complete.
+- [ ] Phase 10 complete.
+- [ ] Phase 11 complete.
+- [ ] Phase 12 complete.
 
 Current phase:
 
 ```text
-Phase 0 pending: Termux local preflight and repository placement.
+Phase 0 consolidation pending: Agent must verify local prepared repos and write target repo GOAL.md.
 ```
 
 Next action:
 
 ```text
-Run the Agent or Termux preflight script to verify gh/git/python, prepare ~/prj/termux-mcp, create ~/prj/termux-codeplane, and begin Phase 1.
+Run Agent with this goal. Agent must verify Phase 0, create/update ~/prj/termux-codeplane/GOAL.md, then proceed through Phase 1, Phase 2, and Phase 3 at minimum. If Phase 3 completes safely, continue into Phase 4+.
 ```
-
-## Acceptance Ledger
-
-- [ ] Phase 0 preflight and repository placement complete.
-- [ ] Phase 1 repository bootstrap complete.
-- [ ] Phase 1 commit pushed.
-- [ ] Phase 2 code cognition MVP complete.
-- [ ] Phase 2 commit pushed.
-- [ ] Phase 3 change bundle execution MVP complete.
-- [ ] Phase 3 commit pushed.
-- [ ] `humtr/loop` unchanged.
-- [ ] `~/work/termux-mcp` unchanged.
-- [ ] `~/prj/termux-mcp` prepared without disturbing live runtime.
-- [ ] no force push used.
-- [ ] no secrets committed.
-- [ ] final local status clean.
-- [ ] final remote status verified where practical.
 
 ## Not Proven Yet
 
-- Whether `gh repo create` is already authenticated on this Termux device.
-- Whether `~/prj/termux-mcp` already exists.
+- Whether `~/prj/termux-codeplane` local checkout is clean and ready.
+- Whether `~/prj/termux-mcp` local checkout is clean and pushed.
 - Whether worktree execution can be fully implemented in the first Agent invocation.
 - Whether Phase 3 real self-proof should commit a harmless example change or stay dry-run only.
-- Whether future `termux-mcp` wrappers should be added as `termux-codeplane-p1` or as a later `termux-mcp-p5`.
+- Whether future `termux-mcp` wrappers should be added as a separate app name or under a later p5/p6 surface.
+- Whether Worker queue is required before live migration or can be deferred until after local MCP wrapper proof.
