@@ -11,7 +11,7 @@
       "path": "goals/termux-codeplane-goal.md",
       "repository": "/data/data/com.termux/files/home/prj/termux-codeplane",
       "branch": "main",
-      "description": "Termux-specific full-code cognition and execution plane bootstrap through Phase 3"
+      "description": "Termux Codeplane full architecture: code cognition, execution, MCP integration, live migration, and production hardening through Phase 12"
     }
   }
 }
