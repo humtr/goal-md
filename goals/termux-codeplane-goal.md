@@ -1,5 +1,32 @@
 # Goal: Termux Codeplane Full Architecture
 
+
+## Current Runtime Override: MCP Already Live on PRJ
+
+Recorded: 20260708-083414
+
+Verified current live MCP state:
+
+- cwd: /data/data/com.termux/files/home/prj/termux-mcp
+- safeRoot: /data/data/com.termux/files/home/prj
+- port: 3000
+- worker: https://termux.humtr.workers.dev
+
+Local health evidence at recording time:
+
+{"ok":true,"name":"termux-mcp","version":"0.2.3","cwd":"/data/data/com.termux/files/home/prj/termux-mcp","safeRoot":"/data/data/com.termux/files/home/prj","node":"v24.17.0","platform":"android","arch":"arm64","sessions":2}
+
+Operational rule for future Agent runs:
+
+- Do not migrate MCP again.
+- Do not rollback MCP to /data/data/com.termux/files/home/work/termux-mcp unless explicitly requested for emergency recovery.
+- Treat the PRJ MCP migration as completed preflight evidence.
+- Keep Worker, tunnel, and MCP live path stable while implementing termux-codeplane.
+- Phase 10 and Phase 11 are now post-migration documentation, verification, rollback hardening, and operating proof phases, not instructions to perform the already-completed migration again.
+
+This section overrides any older wording in this document that describes /data/data/com.termux/files/home/work/termux-mcp as the current live runtime.
+
+
 ## Objective
 
 Create `humtr/termux-codeplane` as the Termux-specific full-code cognition and execution plane for ChatGPT-led development, then integrate it with `humtr/termux-mcp` and the existing Worker/tunnel path until the full architecture is proven end to end.
@@ -69,13 +96,13 @@ Canonical source checkout:
 /data/data/com.termux/files/home/prj/termux-mcp
 ```
 
-Current live runtime checkout:
+Legacy pre-migration runtime checkout:
 
 ```text
 /data/data/com.termux/files/home/work/termux-mcp
 ```
 
-The live runtime must remain stable until explicit migration.
+This legacy checkout remains available only as rollback and reference material after the completed PRJ migration.
 
 ## Goal-Led Agent Loop
 
@@ -140,13 +167,13 @@ Forbidden:
 
 ### Preserve Existing MCP Runtime
 
-Do not move, delete, or rewrite the live runtime checkout during bootstrap and codeplane development:
+Do not move, delete, rollback, or rewrite the current PRJ live runtime during termux-codeplane bootstrap. Legacy checkout reference:
 
 ```text
 /data/data/com.termux/files/home/work/termux-mcp
 ```
 
-Do not change the current Cloudflare Worker, tunnel, or live MCP registration before the dedicated migration phase.
+Do not change the current Cloudflare Worker, tunnel, or MCP registration during termux-codeplane implementation unless a dedicated later phase explicitly requires a controlled change with rollback.
 
 ### Prepare Canonical MCP Checkout
 
@@ -255,9 +282,11 @@ Solidify repository placement and remote availability without disrupting the liv
 - Verify `~/prj/goal-md` exists and can resolve alias `termux-codeplane`.
 - Verify `humtr/termux-codeplane` exists remotely.
 - Verify `humtr/termux-mcp` exists remotely.
-- Verify `~/prj/termux-mcp` exists as a non-live source checkout.
+- Verify ~/prj/termux-mcp exists as the current live MCP checkout.
+- Verify current MCP cwd is /data/data/com.termux/files/home/prj/termux-mcp.
+- Verify current MCP safeRoot is /data/data/com.termux/files/home/prj.
 - Verify `~/prj/termux-codeplane` exists as a local checkout or empty initialized repo.
-- Verify `~/work/termux-mcp` remains unchanged and live.
+- Verify ~/work/termux-mcp remains available only as legacy rollback and reference material.
 - Record the preflight report path in `GOAL.md`.
 
 ### Current Evidence
@@ -266,6 +295,9 @@ Solidify repository placement and remote availability without disrupting the liv
 - [x] `humtr/termux-mcp` exists as a private repository.
 - [x] `humtr/goal-md` contains alias `termux-codeplane`.
 - [x] User reported repository preflight was completed.
+- [x] MCP live runtime has been migrated to /data/data/com.termux/files/home/prj/termux-mcp.
+- [x] MCP external tool call verified cwd=/data/data/com.termux/files/home/prj/termux-mcp.
+- [x] MCP external tool call verified safeRoot=/data/data/com.termux/files/home/prj.
 - [ ] Agent must still verify local paths and statuses at run start.
 
 ### Acceptance
@@ -273,9 +305,11 @@ Solidify repository placement and remote availability without disrupting the liv
 - [ ] Tooling verified.
 - [ ] `~/prj` exists.
 - [ ] external goal is readable locally or from GitHub.
-- [ ] `~/prj/termux-mcp` is present as a non-live checkout.
+- [ ] ~/prj/termux-mcp is present as the current live MCP checkout.
+- [ ] MCP cwd is /data/data/com.termux/files/home/prj/termux-mcp.
+- [ ] MCP safeRoot is /data/data/com.termux/files/home/prj.
 - [ ] `~/prj/termux-codeplane` is present.
-- [ ] `~/work/termux-mcp` remains unchanged and live.
+- [ ] ~/work/termux-mcp remains available only as legacy rollback and reference material.
 - [ ] Phase 0 result is recorded in target repo `GOAL.md`.
 
 ## Phase 1: Bootstrap `termux-codeplane` Repository Identity
@@ -773,6 +807,9 @@ Initial state:
 - [x] `humtr/termux-codeplane` exists as a private repository.
 - [x] `humtr/termux-mcp` exists as a private repository.
 - [x] User reported repository preflight completed.
+- [x] MCP live runtime migrated to /data/data/com.termux/files/home/prj/termux-mcp.
+- [x] MCP safeRoot verified as /data/data/com.termux/files/home/prj.
+- [x] ChatGPT-to-MCP external tool call verified after migration.
 - [ ] Agent must verify local `~/prj` status at start.
 - [ ] target repository `GOAL.md` created.
 - [ ] Phase 0 complete.
@@ -792,13 +829,13 @@ Initial state:
 Current phase:
 
 ```text
-Phase 0 consolidation pending: Agent must verify local prepared repos and write target repo GOAL.md.
+Phase 0 consolidation pending: MCP PRJ migration is completed and verified; Agent must verify local prepared repos and write target repo GOAL.md.
 ```
 
 Next action:
 
 ```text
-Run Agent with this goal. Agent must verify Phase 0, create/update ~/prj/termux-codeplane/GOAL.md, then proceed through Phase 1, Phase 2, and Phase 3 at minimum. If Phase 3 completes safely, continue into Phase 4+.
+Run Agent with this goal. Agent must treat MCP PRJ migration as completed evidence, verify Phase 0, create/update ~/prj/termux-codeplane/GOAL.md, then proceed through Phase 1, Phase 2, and Phase 3 at minimum. If Phase 3 completes safely, continue into Phase 4+.
 ```
 
 ## Not Proven Yet
